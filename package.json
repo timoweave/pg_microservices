@@ -5,6 +5,7 @@
   "scripts": {
     "psql": "docker exec -it pg_microservices-postgres-1 psql -U postgres_user postgres",
     "ps": "docker ps --format 'table {{.Names}}\t{{.Ports}}'",
+    "restart": "docker compose restart",
     "down": "docker compose down",
     "up": "docker compose up"
   },
