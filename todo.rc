@@ -1,0 +1,4 @@
+curl -X 'GET' \
+  'http://localhost:3000/todo' \
+  -H 'accept: application/json' \
+  -H 'Range-Unit: items'

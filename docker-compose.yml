@@ -1,0 +1,99 @@
+version: '3'
+services:
+  pgadmin4:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8000:80"
+    env_file:
+      - .env_pgadmin4
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./pgadmin4_path:/var/lib/pgadmin
+    networks:
+      - postgres_network
+  graphile:
+    image: graphile/postgraphile
+    restart: always
+    command:
+      [
+          "--connection", "postgres://postgres_user:postgres_password@postgres:5432/postgres",
+          "--port", "5000",
+          "--schema", "public",
+          "--export-schema-graphql", "schema.graphql",
+          "--watch",
+          "--dynamic-json",
+          "--sort-export",
+          "--enhance-graphiql"
+          # "--append-plugins",
+          # "postgraphile-plugin-connection-filter,custom-plugin,@graphile-contrib/pg-simplify-inflector",
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5050:5000"
+    networks:
+      - postgres_network
+  swagger:
+    image: swaggerapi/swagger-ui
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env_swagger
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres_network
+  postgrest:
+    image: postgrest/postgrest
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env_postgrest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres_network
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env_postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres_user" ]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - ./postgres_path:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+
+networks:
+  postgres_network:
+    driver: bridge
+
+# volumes:
+#   pgadmin4_volume:
+#   postgres_volume:
+#      driver: azure_file
+#      driver_opts:
+#        share_name: p1share
+#        storage_account_name: p1account
+#        storage_account_key: "6F1vHYvh+mzm6vlwa3DmGba+XVAstCWK+zcmf/4B5ysJZPJD+Ih2twcYP0p0P7aeFgpAHKVORK39+AStbb2Ujg=="
+
+# notes: 
+#   pgadmin4: 
+#     objective: find the correct host name/address
+#     cmd: psql -h localhost -p 5432 -U postgres_user -d postgres -c 'select inet_server_addr();'
+#   postgrest:
+#     objective: reload schema
+#     cmd: psql -h localhost -p 5432 -U postgres_user -d postgres -c "NOTIFY pgrst, 'reload schema'"

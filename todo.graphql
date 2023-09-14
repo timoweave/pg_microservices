@@ -1,0 +1,25 @@
+mutation c1 {
+  createTodo(input: { todo: { title: "buy milk", isDone: false } }) {
+    clientMutationId
+  }
+}
+
+mutation c2 {
+  createTodo(input: { todo: { title: "hang out with buddies" } }) {
+    todo {
+      id
+    }
+  }
+}
+
+query r1 {
+  allTodos {
+    nodes {
+      id
+      title
+      isDone
+      createdAt
+    }
+    totalCount
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "pg_microservices",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "down": "docker compose down",
+    "up": "docker compose up"
+  },
+  "author": "",
+  "license": "ISC"
+}
