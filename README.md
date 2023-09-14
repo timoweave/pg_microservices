@@ -1,6 +1,9 @@
 # Starting microservices
 This microservices is composed of 1. pgAdmin4 over the localhost, 2. swagger for restful openAPI, 3. postgraphile for GraphQL, and 4. postgres which is accessible by `psql`.
 
+Here is the network layout.
+![network layout](./docs/pg_micros_docker_network.png)
+
 1. run the following command to start postgres microservices
 ```
 % npm run up
