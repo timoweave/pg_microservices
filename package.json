@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "psql": "docker exec -it pg_microservices-postgres-1 psql -U postgres_user postgres",
+    "ps": "docker ps --format 'table {{.Names}}\t{{.Ports}}'",
     "down": "docker compose down",
     "up": "docker compose up"
   },
