@@ -2,6 +2,7 @@
 services:
   pgadmin4:
     image: dpage/pgadmin4
+    container_name: pgadmin4
     restart: always
     ports:
       - "8000:80"
@@ -16,6 +17,7 @@ services:
       - postgres_network
   graphile:
     image: graphile/postgraphile
+    container_name: postgraphile
     restart: always
     command:
       [
@@ -41,6 +43,7 @@ services:
       - postgres_network
   swagger:
     image: swaggerapi/swagger-ui
+    container_name: swagger
     restart: always
     ports:
       - "8080:8080"
@@ -53,6 +56,7 @@ services:
       - postgres_network
   postgrest:
     image: postgrest/postgrest
+    container_name: postgrest
     restart: always
     ports:
       - "3000:3000"
@@ -65,6 +69,7 @@ services:
       - postgres_network
   postgres:
     image: postgres
+    container_name: postgres
     ports:
       - "5432:5432"
     env_file:
@@ -80,10 +85,47 @@ services:
       - postgres_network
   jupyter:
     image: jupyter/scipy-notebook
+    container_name: jupyter
     ports:
       - "8888:8888"
     volumes:
       - ./jupyter_path:/home/jovyan
+    networks:
+      - postgres_network
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-webui
+    volumes:
+      - ./open_webui_path:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - 8088:8080
+    environment:
+      - OLLAMA_BASE_URLS=http://host.docker.internal:11434
+      - WEBUI_AUTH=False
+      - WEBUI_URL=http://localhost:8080
+      # - ENV=dev
+      # - WEBUI_NAME=
+      # - WEBUI_SECRET_KEY=
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+    networks:
+      - postgres_network
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama_path:/root/.ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
     networks:
       - postgres_network
 
