@@ -1,4 +1,4 @@
-version: '3'
+
 services:
   pgadmin4:
     image: dpage/pgadmin4
@@ -22,7 +22,7 @@ services:
           "--connection", "postgres://postgres_user:postgres_password@postgres:5432/postgres",
           "--port", "5000",
           "--schema", "public",
-          "--export-schema-graphql", "schema.graphql",
+          "--export-schema-graphql", "/postgraphile/generated/schema.graphql",
           "--watch",
           "--dynamic-json",
           "--sort-export",
@@ -30,11 +30,13 @@ services:
           # "--append-plugins",
           # "postgraphile-plugin-connection-filter,custom-plugin,@graphile-contrib/pg-simplify-inflector",
       ]
+    volumes:
+      - ./postgraphile_path:/postgraphile/generated
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - "5050:5000"
+      - "5001:5000"
     networks:
       - postgres_network
   swagger:
@@ -76,6 +78,14 @@ services:
       - ./postgres_path:/var/lib/postgresql/data
     networks:
       - postgres_network
+  jupyter:
+    image: jupyter/scipy-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jupyter_path:/home/jovyan
+    networks:
+      - postgres_network
 
 networks:
   postgres_network:
@@ -90,8 +100,8 @@ networks:
 #        storage_account_name: p1account
 #        storage_account_key: "6F1vHYvh+mzm6vlwa3DmGba+XVAstCWK+zcmf/4B5ysJZPJD+Ih2twcYP0p0P7aeFgpAHKVORK39+AStbb2Ujg=="
 
-# notes: 
-#   pgadmin4: 
+# notes:
+#   pgadmin4:
 #     objective: find the correct host name/address
 #     cmd: psql -h localhost -p 5432 -U postgres_user -d postgres -c 'select inet_server_addr();'
 #   postgrest:
