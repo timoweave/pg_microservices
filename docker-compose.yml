@@ -93,8 +93,8 @@ services:
     networks:
       - postgres_network
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: ollama-webui
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
     volumes:
       - ./open_webui_path:/app/backend/data
     depends_on:
@@ -102,7 +102,7 @@ services:
     ports:
       - 8088:8080
     environment:
-      - OLLAMA_BASE_URLS=http://host.docker.internal:11434
+      - OLLAMA_BASE_URLS=http://ollama:11434
       - WEBUI_AUTH=False
       - WEBUI_URL=http://localhost:8080
       # - ENV=dev
